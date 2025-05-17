@@ -1,19 +1,19 @@
-# Victoria – Final Decision Tree Model using best hyperparameters
+# Victoria – Decision Tree Classifier with sentence-level accuracy
 
 import pandas as pd
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import GroupKFold, cross_val_score
-from sklearn.metrics import make_scorer, f1_score
+from sklearn.model_selection import GroupKFold
 
 # Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
-# data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")  # if using simpler set
-
+#data = pd.read_csv("preprocessed_train.csv")
+#data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")  # reduced version
+data = pd.read_csv("v4_preprocessed_train_degree.csv")  # reduced version
 # Define features and target
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']  # change if needed
+numerical_features = ['degree']
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(
@@ -22,12 +22,11 @@ preprocessor = ColumnTransformer(
         ('num', 'passthrough', numerical_features)
     ])
 
-# Transform features
 X = preprocessor.fit_transform(data)
 y = data['target']
 groups = data['sentence_id']
 
-# Best tuned Decision Tree model
+# Best-tuned Decision Tree
 model = DecisionTreeClassifier(
     class_weight='balanced',
     max_depth=4,
@@ -37,21 +36,32 @@ model = DecisionTreeClassifier(
     random_state=42
 )
 
-# Define F1 scorer for class 1
-f1_scorer = make_scorer(f1_score, pos_label=1)
-
-# Cross-validation
+# Sentence-level accuracy evaluation
 group_kfold = GroupKFold(n_splits=5)
-cv_scores = cross_val_score(
-    model, X, y,
-    cv=group_kfold,
-    groups=groups,
-    scoring=f1_scorer
-)
+accuracies = []
 
-# Print results
-print(f"F1 Scores per fold: {cv_scores}")
-print(f"Mean F1 (Class 1): {cv_scores.mean():.3f} (±{cv_scores.std():.3f})")
+for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=groups)):
+    print(f"Fold {fold_idx + 1}")
+    X_train, X_test = X[train_idx], X[test_idx]
+    y_train, y_test = y[train_idx], y[test_idx]
+    groups_test = groups.iloc[test_idx]
 
-# Fit on full data (optional, e.g. for final predictions)
-model.fit(X, y)
+    model.fit(X_train, y_train)
+    proba = model.predict_proba(X_test)[:, 1]
+
+    test_data = data.iloc[test_idx].copy()
+    test_data['proba'] = proba
+
+    # Select predicted root per sentence
+    selected_roots = test_data.groupby('sentence_id', group_keys=False).apply(
+        lambda x: x.loc[x['proba'].idxmax()]
+    )
+
+    accuracy = (selected_roots['target'] == 1).mean()
+    accuracies.append(accuracy)
+    print(f"Fold {fold_idx + 1} Sentence-Level Accuracy: {accuracy:.3f}")
+
+# Summary
+print("\n=== Cross-Validation Results ===")
+print(f"Sentence-Level Accuracies: {accuracies}")
+print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
