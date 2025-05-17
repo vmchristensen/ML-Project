@@ -8,13 +8,13 @@ from sklearn.model_selection import GroupKFold, cross_val_score
 from sklearn.metrics import make_scorer, f1_score
 
 # Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
+#data = pd.read_csv("preprocessed_train.csv")
 # Uncomment below if only using degree and eccentricity features:
 # data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")
-
+data = pd.read_csv("v7_preprocessed_train_pagerank.csv")
 # Define features and target
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity'] # change if using other dataset
+numerical_features = ['pagerank'] # change if using other dataset
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(
