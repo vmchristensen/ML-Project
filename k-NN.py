@@ -1,38 +1,37 @@
-
-# Victoria – k-Nearest Neighbors Classifier
+# Victoria – k-Nearest Neighbors Classifier with sentence-level accuracy
 
 import pandas as pd
+import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GroupKFold, cross_val_score
-from sklearn.metrics import make_scorer, f1_score
+from sklearn.model_selection import GroupKFold
 
-# Load the preprocessed dataset
-#data = pd.read_csv("preprocessed_train.csv")
+# Load data
+data = pd.read_csv("preprocessed_train.csv")
 # For degree + eccentricity only:
-data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")
+# data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")
 
-# Define features and target
+# Define features
 categorical_features = ['language']
-numerical_features = ['degree', 'eccentricity']  # adjust if needed
+numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
 
-# Preprocessing: one-hot for language, scaling for numeric features
+# Preprocessing: One-hot encode language, scale numeric features
 preprocessor = ColumnTransformer(
     transformers=[
         ('lang', OneHotEncoder(handle_unknown='ignore'), categorical_features),
-        ('num', StandardScaler(), numerical_features)  # important for distance-based models like k-NN
+        ('num', StandardScaler(), numerical_features)
     ])
 
-# Define model
+# k-NN model
 model = KNeighborsClassifier(
-    n_neighbors=5,       # Default, can be tuned
-    weights='distance',  # Can also try 'uniform'
-    metric='minkowski'   # Default (p=2 = Euclidean)
+    n_neighbors=5,
+    weights='distance',
+    metric='minkowski'
 )
 
-# Create pipeline (preprocessing + model)
+# Pipeline
 pipeline = Pipeline([
     ('preprocess', preprocessor),
     ('classifier', model)
@@ -43,21 +42,34 @@ X = data[categorical_features + numerical_features]
 y = data['target']
 groups = data['sentence_id']
 
-# F1 scorer
-f1_scorer = make_scorer(f1_score, pos_label=1)
-
-# Grouped CV
+# GroupKFold
 group_kfold = GroupKFold(n_splits=5)
-cv_scores = cross_val_score(
-    pipeline, X, y,
-    cv=group_kfold,
-    groups=groups,
-    scoring=f1_scorer
-)
+accuracies = []
 
-# Output results
-print(f"F1 Scores per fold: {cv_scores}")
-print(f"Mean F1 (Class 1): {cv_scores.mean():.3f} (±{cv_scores.std():.3f})")
+for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=groups)):
+    print(f"Fold {fold_idx + 1}")
+    X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
+    y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
+    test_data = data.iloc[test_idx].copy()
 
-# Fit final model (optional)
-pipeline.fit(X, y)
+    # Fit and predict
+    pipeline.fit(X_train, y_train)
+    proba = pipeline.predict_proba(X_test)[:, 1]
+
+    # Attach probabilities
+    test_data['proba'] = proba
+
+    # Select one root per sentence
+    selected_roots = test_data.groupby('sentence_id', group_keys=False).apply(
+        lambda x: x.loc[x['proba'].idxmax()]
+    )
+
+    # Sentence-level accuracy
+    accuracy = (selected_roots['target'] == 1).mean()
+    accuracies.append(accuracy)
+    print(f"Fold {fold_idx + 1} Sentence-Level Accuracy: {accuracy:.3f}")
+
+# Final results
+print("\n=== Cross-Validation Results ===")
+print(f"Sentence-Level Accuracies: {accuracies}")
+print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
