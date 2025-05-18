@@ -6,14 +6,13 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
+from joblib import dump
 
 # Load the preprocessed dataset
-#data = pd.read_csv("preprocessed_train.csv")
-#data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv")  # reduced version
-data = pd.read_csv("v4_preprocessed_train_degree.csv")  # reduced version
+data = pd.read_csv("preprocessed_train.csv")
 # Define features and target
 categorical_features = ['language']
-numerical_features = ['degree']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(
@@ -28,11 +27,11 @@ groups = data['sentence_id']
 
 # Best-tuned Decision Tree
 model = DecisionTreeClassifier(
-    class_weight='balanced',
     max_depth=4,
-    min_samples_split=5,
-    min_samples_leaf=5,
-    max_features='log2',
+    min_samples_split=2,
+    min_samples_leaf=2,
+    max_features='sqrt',
+    class_weight='balanced',
     random_state=42
 )
 
@@ -65,3 +64,10 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
 print("\n=== Cross-Validation Results ===")
 print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
+
+# Train on full data
+#model.fit(X, y)
+
+# Save model and preprocessor
+#dump(model, 'model.joblib')
+#dump(preprocessor, 'preprocessor.joblib')
