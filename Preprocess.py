@@ -7,12 +7,13 @@ def centralities(edgelist):
     """Compute centrality scores for each node in the tree."""
     T = nx.from_edgelist(edgelist)
     dc = nx.degree_centrality(T)
-    cc = nx.harmonic_centrality(T)
+    cl = nx.closeness_centrality(T)
     bc = nx.betweenness_centrality(T)
     pc = nx.pagerank(T)
+    cc = nx.harmonic_centrality(T)
     ec = nx.eigenvector_centrality(T, max_iter=10000)  # Increased max_iter for convergence
     ecc = nx.eccentricity(T)
-    return {v: (dc[v], cc[v], bc[v], pc[v], ec[v], ecc[v]) for v in T}
+    return {v: (dc[v], cl[v], bc[v], pc[v], cc[v], ec[v], ecc[v]) for v in T}
 
 # Load training data
 train_df = pd.read_csv('train.csv')
@@ -31,7 +32,7 @@ for idx, row in train_df.iterrows():
     # Create DataFrame for nodes in this sentence
     features = np.array([cent[v] for v in nodes])
     df_sentence = pd.DataFrame(features, columns=[
-        'degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity'
+        'degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity'
     ])
     
     # Add metadata columns
@@ -45,7 +46,7 @@ for idx, row in train_df.iterrows():
     df_sentence['target'] = (df_sentence['vertex_id'] == root).astype(int)
     
     # Normalize features within the sentence
-    for col in ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']:
+    for col in ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']:
         mean = df_sentence[col].mean()
         std = df_sentence[col].std()
         if std == 0:
