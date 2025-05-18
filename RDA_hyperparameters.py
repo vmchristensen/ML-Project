@@ -62,7 +62,7 @@ class RDA(BaseEstimator, ClassifierMixin):
 # Load and preprocess data
 data = pd.read_csv("preprocessed_train.csv")
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 preprocessor = ColumnTransformer(
     transformers=[
@@ -126,6 +126,6 @@ print(f"Best mean accuracy: {best_score:.3f}")
 
 """
 === Final Results ===
-Best parameters: {'alpha': 1.0, 'gamma': 0.3}
+Best parameters: {'alpha': 0.5, 'gamma': 0.7}
 Best mean accuracy: 0.344
 """
