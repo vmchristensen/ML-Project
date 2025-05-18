@@ -11,7 +11,7 @@ def centralities(edgelist):
     bc = nx.betweenness_centrality(T)
     pc = nx.pagerank(T)
     cc = nx.harmonic_centrality(T)
-    ec = nx.eigenvector_centrality(T, max_iter=10000)  # Increased max_iter for convergence
+    ec = nx.eigenvector_centrality(T, max_iter=10000)
     ecc = nx.eccentricity(T)
     return {v: (dc[v], cl[v], bc[v], pc[v], cc[v], ec[v], ecc[v]) for v in T}
 
@@ -42,7 +42,7 @@ for idx, row in train_df.iterrows():
     df_sentence['language'] = row['language']
     df_sentence['sentence_group'] = f"{row['language']}_{row['sentence']}"
     
-    # Set target (1 if root, else 0)
+    # Set target 
     df_sentence['target'] = (df_sentence['vertex_id'] == root).astype(int)
     
     # Normalize features within the sentence
@@ -50,7 +50,7 @@ for idx, row in train_df.iterrows():
         mean = df_sentence[col].mean()
         std = df_sentence[col].std()
         if std == 0:
-            df_sentence[col] = 0  # Handle zero std
+            df_sentence[col] = 0
         else:
             df_sentence[col] = (df_sentence[col] - mean) / std
     
