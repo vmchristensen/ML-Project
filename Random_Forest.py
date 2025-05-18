@@ -4,16 +4,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
-from sklearn.metrics import make_scorer, f1_score
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import randint, uniform
+from sklearn.metrics import classification_report, f1_score 
 
 # Load the preprocessed dataset
 data = pd.read_csv("preprocessed_train.csv")
 
 # Define features and target
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(
@@ -24,12 +22,21 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']  # Group by sentence ID
+groups = data['sentence_id']  
+
+# Get feature names after preprocessing
+lang_encoder = preprocessor.named_transformers_['lang']
+lang_features = lang_encoder.get_feature_names_out(categorical_features)
+num_features = numerical_features
+all_features = np.concatenate([lang_features, num_features])
 
 # Initialize model
 model = RandomForestClassifier(
     n_estimators=20,          
-    max_depth=15,             
+    max_depth=30, 
+    min_samples_split=10,
+    min_samples_leaf=4,
+    max_features=0.8,            
     class_weight='balanced',
     n_jobs=-1,
     random_state=42
@@ -38,14 +45,36 @@ model = RandomForestClassifier(
 # Custom cross-validation for sentence-level accuracy
 group_kfold = GroupKFold(n_splits=5)
 accuracies = []
+instance_f1_0 = []  
+instance_f1_1 = []  
+feature_importances = []
 
 for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=groups)):
     print(f"Fold {fold_idx + 1}")
     X_train, X_test = X[train_idx], X[test_idx]
     y_train, y_test = y[train_idx], y[test_idx]
-    groups_test = groups.iloc[test_idx]  # Get sentence IDs for test fold
     
     model.fit(X_train, y_train)
+
+    # ---- Instance-Level Metrics ----
+    y_pred = model.predict(X_test)
+    print("\nInstance-Level Classification Report:")
+    print(classification_report(y_test, y_pred, target_names=['Non-root', 'Root'], digits=3))
+    
+    # Store F1 scores
+    instance_f1_0.append(f1_score(y_test, y_pred, pos_label=0))
+    instance_f1_1.append(f1_score(y_test, y_pred, pos_label=1))
+    
+    # ---- Feature Importance ----
+    importance_df = pd.DataFrame({
+        'feature': all_features,
+        'importance': model.feature_importances_
+    }).sort_values(by='importance', ascending=False)
+    
+    feature_importances.append(importance_df)
+    print(f"\nTop 10 Features for Fold {fold_idx + 1}:")
+    print(importance_df.head(10).to_string(index=False))
+
     # Predict probabilities for class 1 (root)
     proba = model.predict_proba(X_test)[:, 1]
     
@@ -63,57 +92,35 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     accuracies.append(accuracy)
     print(f"Fold {fold_idx + 1} Sentence-Level Accuracy: {accuracy:.3f}")
 
+# ---- Aggregate Results ----
 print("\n=== Cross-Validation Results ===")
-print(f"Sentence-Level Accuracies: {accuracies}")
-print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
+print(f"Sentence-Level Accuracies: {[round(acc, 3) for acc in accuracies]}")
+print(f"Mean Sentence-Level Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
 
-# Mean Accuracy: 0.344 (±0.044)
+print("\n=== Instance-Level Metrics ===")
+print(f"Non-Root F1 Scores: {[round(f1, 3) for f1 in instance_f1_0]}")
+print(f"Mean Non-Root F1: {np.mean(instance_f1_0):.3f} (±{np.std(instance_f1_0):.3f})")
+print(f"\nRoot F1 Scores: {[round(f1, 3) for f1 in instance_f1_1]}")
+print(f"Mean Root F1: {np.mean(instance_f1_1):.3f} (±{np.std(instance_f1_1):.3f})")
 
-
-# Hyperparameter Tuning (Optional: Uncomment and adjust as needed)
-"""
-param_dist = {
-    'n_estimators': randint(100, 500),
-    'max_depth': [None] + list(range(10, 60, 10)),
-    'min_samples_split': randint(2, 20),
-    'min_samples_leaf': randint(1, 10),
-    'max_features': ['sqrt', 'log2', 0.8],
-    'class_weight': ['balanced', {0:1, 1:5}]
-}
-
-random_search = RandomizedSearchCV(
-    estimator=model,
-    param_distributions=param_dist,
-    n_iter=30,
-    cv=GroupKFold(n_splits=5),
-    scoring=make_scorer(f1_score, pos_label=1),  # Optional: Replace with custom scorer
-    n_jobs=-1,
-    verbose=1,
-    random_state=42
+# ---- Average Feature Importance ----
+average_importance = (
+    pd.concat(feature_importances)
+    .groupby('feature')['importance']
+    .mean()
+    .sort_values(ascending=False)
 )
+print("\n=== Average Feature Importance Across Folds ===")
+print(average_importance.head(20).to_string())
 
-random_search.fit(X, y, groups=groups)
-best_model = random_search.best_estimator_
 """
-
-"""# After training, use this to predict on test data:
-def predict_test_set(model, preprocessor, test_csv_path):
-    test_data = pd.read_csv(test_csv_path)
-    # Preprocess test data (ensure same preprocessing as training)
-    X_test = preprocessor.transform(test_data)
-    test_data['proba'] = model.predict_proba(X_test)[:, 1]
-    
-    # Group by sentence_id and select root with highest probability
-    predictions = test_data.groupby('sentence_id').apply(
-        lambda x: x.loc[x['proba'].idxmax()]
-    ).reset_index()
-    
-    # Format submission (adjust column names as per your data)
-    submission = predictions[['id', 'root']]  # Replace 'root' with the correct node ID column
-    submission.columns = ['id', 'root']
-    return submission
-
-# Example usage:
-# best_model.fit(X, y)  # Train on full data
-# submission = predict_test_set(best_model, preprocessor, "preprocessed_test.csv")
-# submission.to_csv("submission.csv", index=False)"""
+=== Best Hyperparameters ===
+{'n_estimators': 20, 'max_depth': 30, 'min_samples_split': 18, 'min_samples_leaf': 7, 'max_features': 3, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}    
+Validation Accuracy: 0.370
+🔍 Testing parameters: {'n_estimators': 50, 'max_depth': 20, 'min_samples_split': 17, 'min_samples_leaf': 8, 'max_features': 'log2', 'class_weight': None, 'n_jobs': -1, 'random_state': 42}
+✅ Iteration result: Score = 0.382
+🔍 Testing parameters: {'n_estimators': 20, 'max_depth': 30, 'min_samples_split': 10, 'min_samples_leaf': 4, 'max_features': 0.8, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
+✅ Iteration result: Score = 0.376
+Testing parameters: {'n_estimators': 20, 'max_depth': 40, 'min_samples_split': 14, 'min_samples_leaf': 7, 'max_features': 0.8, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
+✅ Iteration result: Score = 0.376
+"""
