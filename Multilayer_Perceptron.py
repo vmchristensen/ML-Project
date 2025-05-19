@@ -217,3 +217,20 @@ for key, value in best_params.items():
 
 # Parameters: {'learning_rate': 0.0001, 'hidden_layers': (256, 128, 64), 'dropout_rate': 0.3, 'batch_size': 256, 'weight_decay': 1e-05, 'optimizer': 'adam'}
 # score 0.344
+
+"""
+🔥 New best score: 0.352!
+
+Trial completed in 177.9s
+Current best accuracy: 0.352
+
+=== HYPERPARAMETER SEARCH RESULTS ===
+Best validation accuracy: 0.352
+Best parameters:
+- learning_rate: 0.001
+- hidden_layers: (128, 64)
+- dropout_rate: 0.4
+- batch_size: 512
+- weight_decay: 1e-05
+- optimizer: adam
+"""

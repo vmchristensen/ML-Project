@@ -22,7 +22,7 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # Hyperparameter grid
 param_grid = {
@@ -128,3 +128,20 @@ num__closeness: 0.0094
 num__eccentricity: 0.0036
 lang__language_Korean: 0.0020
 lang__language_Russian: 0.0008"""
+
+
+"""
+=== Best Parameters ===
+Best Sentence-Level Accuracy: 0.524
+Optimal Parameters: {'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2'}
+
+=== Feature Importances ===
+num__closeness: 0.9214
+num__harmonic: 0.0264
+num__pagerank: 0.0255
+num__eccentricity: 0.0141
+lang__language_Japanese: 0.0087
+lang__language_Korean: 0.0016
+lang__language_Thai: 0.0012
+num__betweenness: 0.0011
+"""

@@ -40,7 +40,7 @@ pipeline = Pipeline([
 # Prepare data
 X = data[categorical_features + numerical_features]
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # GroupKFold
 group_kfold = GroupKFold(n_splits=5)

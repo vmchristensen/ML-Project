@@ -22,7 +22,7 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']  
+groups = data['sentence_group']  
 
 # Get feature names after preprocessing
 lang_encoder = preprocessor.named_transformers_['lang']

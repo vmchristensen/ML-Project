@@ -21,7 +21,7 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # Custom evaluation for hyperparameter tuning
 def evaluate_params(params, X, y, groups, n_splits=5):
@@ -60,10 +60,10 @@ for i in range(n_iter):
     print("----------------------------------------")
     params = {
         'n_estimators': random.choice([20, 50, 100, 300]),
-        'max_depth': np.random.choice([None] + list(range(10, 60, 10))),
-        'min_samples_split': randint(2, 20).rvs(),
-        'min_samples_leaf': randint(1, 10).rvs(),
-        'max_features': random.choice([2, 3, 4]),
+        'max_depth': random.choice([4, 8, 12]),
+        'min_samples_split': randint(2, 5).rvs(),
+        'min_samples_leaf': randint(1, 5).rvs(),
+        'max_features': random.choice(['sqrt']),
         'class_weight': 'balanced',
         'n_jobs': -1,
         'random_state': 42

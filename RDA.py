@@ -88,7 +88,7 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # Initialize custom RDA model
 model = RDA(alpha=1, gamma=0.3)

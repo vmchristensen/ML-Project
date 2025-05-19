@@ -72,7 +72,7 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # Hyperparameter grid
 param_grid = {

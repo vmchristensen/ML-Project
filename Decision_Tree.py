@@ -23,14 +23,14 @@ preprocessor = ColumnTransformer(
 
 X = preprocessor.fit_transform(data)
 y = data['target']
-groups = data['sentence_id']
+groups = data['sentence_group']
 
 # Best-tuned Decision Tree
 model = DecisionTreeClassifier(
-    max_depth=4,
+    max_depth=3,
     min_samples_split=2,
-    min_samples_leaf=2,
-    max_features='sqrt',
+    min_samples_leaf=1,
+    max_features='log2',
     class_weight='balanced',
     random_state=42
 )
@@ -66,8 +66,8 @@ print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
 
 # Train on full data
-#model.fit(X, y)
+# model.fit(X, y)
 
 # Save model and preprocessor
-#dump(model, 'model.joblib')
-#dump(preprocessor, 'preprocessor.joblib')
+# dump(model, 'model.joblib')
+# dump(preprocessor, 'preprocessor.joblib')
