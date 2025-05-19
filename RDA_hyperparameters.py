@@ -103,7 +103,7 @@ for alpha in param_grid['alpha']:
             # Prediction and grouping
             test_data = data.iloc[test_idx].copy()
             test_data['proba'] = model.predict_proba(X_test)[:, 1]
-            selected_roots = test_data.groupby('sentence_id').apply(lambda x: x.loc[x['proba'].idxmax()])
+            selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
             
             # Accuracy calculation
             fold_accuracy = (selected_roots['target'] == 1).mean()

@@ -108,7 +108,7 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     # Group by sentence_id and select root with highest probability
     test_data = data.iloc[test_idx].copy()
     test_data['proba'] = proba
-    selected_roots = test_data.groupby('sentence_id').apply(lambda x: x.loc[x['proba'].idxmax()])
+    selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
     
     accuracy = (selected_roots['target'] == 1).mean()
     accuracies.append(accuracy)

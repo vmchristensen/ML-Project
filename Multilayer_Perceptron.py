@@ -187,7 +187,7 @@ for trial_idx, params in enumerate(param_combinations):
         
         test_data = data.iloc[test_idx].copy()
         test_data['proba'] = probabilities
-        selected_roots = test_data.groupby('sentence_id').apply(lambda x: x.loc[x['proba'].idxmax()])
+        selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
         accuracy = (selected_roots['target'] == 1).mean()
         fold_accuracies.append(accuracy)
         

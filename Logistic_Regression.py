@@ -55,9 +55,7 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     test_data['proba'] = proba
 
     # Select one predicted root per sentence
-    selected_roots = test_data.groupby('sentence_id').apply(
-        lambda x: x.loc[x['proba'].idxmax()]
-    )
+    selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
 
     # Sentence-level accuracy
     accuracy = (selected_roots['target'] == 1).mean()

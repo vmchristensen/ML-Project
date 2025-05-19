@@ -52,9 +52,7 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     test_data['proba'] = proba
 
     # Select predicted root per sentence
-    selected_roots = test_data.groupby('sentence_id', group_keys=False).apply(
-        lambda x: x.loc[x['proba'].idxmax()]
-    )
+    selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
 
     accuracy = (selected_roots['target'] == 1).mean()
     accuracies.append(accuracy)
@@ -66,8 +64,8 @@ print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
 
 # Train on full data
-# model.fit(X, y)
+model.fit(X, y)
 
 # Save model and preprocessor
-# dump(model, 'model.joblib')
-# dump(preprocessor, 'preprocessor.joblib')
+dump(model, 'model.joblib')
+dump(preprocessor, 'preprocessor.joblib')

@@ -16,9 +16,7 @@ proba = model.predict_proba(X_test)[:, 1]
 test_data['proba'] = proba
 
 # Select root with highest probability per sentence
-selected_roots = test_data.groupby('sentence_id', group_keys=False).apply(
-    lambda x: x.loc[x['proba'].idxmax()]
-)
+selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
 
 # Create submission file
 submission = selected_roots[['sentence_id', 'vertex_id']].rename(
