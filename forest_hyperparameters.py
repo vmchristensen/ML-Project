@@ -10,7 +10,7 @@ import random
 # Load data
 data = pd.read_csv("preprocessed_train.csv")
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing
 preprocessor = ColumnTransformer(

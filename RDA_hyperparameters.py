@@ -126,6 +126,6 @@ print(f"Best mean accuracy: {best_score:.3f}")
 
 """
 === Final Results ===
-Best parameters: {'alpha': 0.5, 'gamma': 0.7}
-Best mean accuracy: 0.344
+Best parameters: {'alpha': 1.0, 'gamma': 0.6}
+Best mean accuracy: 0.305
 """

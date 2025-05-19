@@ -215,9 +215,6 @@ print("Best parameters:")
 for key, value in best_params.items():
     print(f"- {key}: {value}")
 
-# Parameters: {'learning_rate': 0.0001, 'hidden_layers': (256, 128, 64), 'dropout_rate': 0.3, 'batch_size': 256, 'weight_decay': 1e-05, 'optimizer': 'adam'}
-# score 0.344
-
 """
 🔥 New best score: 0.352!
 

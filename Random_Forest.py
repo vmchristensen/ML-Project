@@ -11,7 +11,7 @@ data = pd.read_csv("preprocessed_train.csv")
 
 # Define features and target
 categorical_features = ['language']
-numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(

@@ -15,7 +15,7 @@ data = pd.read_csv("preprocessed_train.csv")
 
 # Define features
 categorical_features = ['language']
-numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing: One-hot encode language, scale numeric features
 preprocessor = ColumnTransformer(
