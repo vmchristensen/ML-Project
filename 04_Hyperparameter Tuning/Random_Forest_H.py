@@ -6,9 +6,12 @@ from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
 from scipy.stats import randint
 import random
+from pathlib import Path
 
 # Load data
-data = pd.read_csv("preprocessed_train.csv")
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
@@ -51,25 +54,25 @@ n_iter = 30
 best_score = -np.inf
 best_params = None
 
-print(f"\n🚀 Starting randomized hyperparameter search with {n_iter} iterations...\n")
+print(f"\nStarting randomized hyperparameter search with {n_iter} iterations...\n")
 
 for i in range(n_iter):
-    print(f"\n📊 Iteration {i+1}/{n_iter} - {((i+1)/n_iter)*100:.0f}% complete")
+    print(f"\nIteration {i+1}/{n_iter} - {((i+1)/n_iter)*100:.0f}% complete")
     print("----------------------------------------")
     params = {
-        'n_estimators': random.choice([20, 50, 100, 300]),
-        'max_depth': random.choice([4, 8, 12]),
-        'min_samples_split': randint(2, 5).rvs(),
-        'min_samples_leaf': randint(1, 5).rvs(),
-        'max_features': random.choice(['sqrt']),
+        'n_estimators': random.choice([20, 100, 300, 500, 1000]),
+        'max_depth': random.choice([None, 3, 5, 10, 20]),
+        'min_samples_split': random.choice([2, 5, 10]),
+        'min_samples_leaf': random.choice([1, 2, 5]),
+        'max_features': random.choice(['sqrt', 'log2', None]),
         'class_weight': 'balanced',
         'n_jobs': -1,
         'random_state': 42
     }
     
-    print("🔍 Testing parameters:", params)
+    print("Testing parameters:", params)
     score = evaluate_params(params, X, y, groups)
-    print(f"✅ Iteration result: Score = {score:.3f}")
+    print(f"Iteration result: Score = {score:.3f}")
     
     if score > best_score:
         best_score = score
@@ -82,6 +85,6 @@ print(f"Validation Accuracy: {best_score:.3f}")
 
 """
 === Best Hyperparameters ===
-{'n_estimators': 20, 'max_depth': 30, 'min_samples_split': 18, 'min_samples_leaf': 7, 'max_features': 3, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}    
-Validation Accuracy: 0.370
+Testing parameters: {'n_estimators': 20, 'max_depth': None, 'min_samples_split': 2, 'min_samples_leaf': 5, 'max_features': 'log2', 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
+Iteration result: Score = 0.333
 """

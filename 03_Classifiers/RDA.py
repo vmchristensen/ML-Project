@@ -5,6 +5,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
+from pathlib import Path
 
 class RDA(BaseEstimator, ClassifierMixin):
     """
@@ -72,8 +73,10 @@ class RDA(BaseEstimator, ClassifierMixin):
         return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
 
-# Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 
 # Define features and target
 categorical_features = ['language']
@@ -117,5 +120,3 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
 print("\n=== Cross-Validation Results ===")
 print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
-
-# Mean Accuracy: 0.334 (±0.022)

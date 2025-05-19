@@ -1,41 +1,42 @@
-# Victoria – Decision Tree Classifier with sentence-level accuracy
-
 import pandas as pd
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
-from joblib import dump
+from pathlib import Path
 
-# Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
+
 # Define features and target
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
-# Preprocessing pipeline
+# Preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
         ('lang', OneHotEncoder(handle_unknown='ignore'), categorical_features),
         ('num', 'passthrough', numerical_features)
-    ])
+    ]
+)
 
 X = preprocessor.fit_transform(data)
 y = data['target']
 groups = data['sentence_group']
 
-# Best-tuned Decision Tree
-model = DecisionTreeClassifier(
-    max_depth=3,
-    min_samples_split=2,
-    min_samples_leaf=1,
-    max_features='log2',
+# Logistic Regression model
+model = LogisticRegression(
     class_weight='balanced',
+    solver='liblinear',
+    penalty='l2',
+    max_iter=1000,
     random_state=42
 )
 
-# Sentence-level accuracy evaluation
+# Grouped CV using sentence-level accuracy
 group_kfold = GroupKFold(n_splits=5)
 accuracies = []
 
@@ -48,24 +49,19 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     model.fit(X_train, y_train)
     proba = model.predict_proba(X_test)[:, 1]
 
+    # Attach predictions to test data
     test_data = data.iloc[test_idx].copy()
     test_data['proba'] = proba
 
-    # Select predicted root per sentence
+    # Select one predicted root per sentence
     selected_roots = test_data.loc[test_data.groupby('sentence_id')['proba'].idxmax()]
 
+    # Sentence-level accuracy
     accuracy = (selected_roots['target'] == 1).mean()
     accuracies.append(accuracy)
     print(f"Fold {fold_idx + 1} Sentence-Level Accuracy: {accuracy:.3f}")
 
-# Summary
+# Final results
 print("\n=== Cross-Validation Results ===")
 print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
-
-# Train on full data
-model.fit(X, y)
-
-# Save model and preprocessor
-dump(model, 'model.joblib')
-dump(preprocessor, 'preprocessor.joblib')

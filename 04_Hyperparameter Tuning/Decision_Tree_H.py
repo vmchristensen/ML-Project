@@ -5,9 +5,12 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
 from itertools import product
+from pathlib import Path
 
-# Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 
 # Define features and target
 categorical_features = ['language']
@@ -112,21 +115,6 @@ feature_importance = sorted(
 # Print results
 for name, importance in feature_importance:
     print(f"{name}: {importance:.4f}")
-
-"""Mean Sentence-Level Accuracy: 0.602
-Optimal Parameters: {'max_depth': 4, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt'}
-=== Feature Importances ===
-num__betweenness: 0.8085
-num__harmonic: 0.1118
-num__degree: 0.0245
-num__eigenvector: 0.0153
-lang__language_Japanese: 0.0126
-num__pagerank: 0.0116
-num__closeness: 0.0094
-num__eccentricity: 0.0036
-lang__language_Korean: 0.0020
-lang__language_Russian: 0.0008"""
-
 
 """
 === Best Parameters ===

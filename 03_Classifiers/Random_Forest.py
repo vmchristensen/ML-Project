@@ -5,9 +5,12 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import classification_report, f1_score 
+from pathlib import Path
 
-# Load the preprocessed dataset
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 
 # Define features and target
 categorical_features = ['language']
@@ -110,15 +113,3 @@ average_importance = (
 )
 print("\n=== Average Feature Importance Across Folds ===")
 print(average_importance.head(20).to_string())
-
-"""
-=== Best Hyperparameters ===
-{'n_estimators': 20, 'max_depth': 30, 'min_samples_split': 18, 'min_samples_leaf': 7, 'max_features': 3, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}    
-Validation Accuracy: 0.370
-🔍 Testing parameters: {'n_estimators': 50, 'max_depth': 20, 'min_samples_split': 17, 'min_samples_leaf': 8, 'max_features': 'log2', 'class_weight': None, 'n_jobs': -1, 'random_state': 42}
-✅ Iteration result: Score = 0.382
-🔍 Testing parameters: {'n_estimators': 20, 'max_depth': 30, 'min_samples_split': 10, 'min_samples_leaf': 4, 'max_features': 0.8, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
-✅ Iteration result: Score = 0.376
-Testing parameters: {'n_estimators': 20, 'max_depth': 40, 'min_samples_split': 14, 'min_samples_leaf': 7, 'max_features': 0.8, 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
-✅ Iteration result: Score = 0.376
-"""

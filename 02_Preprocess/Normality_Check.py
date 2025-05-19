@@ -2,14 +2,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+from pathlib import Path
 
-# Load one of your preprocessed datasets
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 #data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv") # Or your preferred one for this check
 
 # Define your numerical features
 if 'pagerank' in data.columns:
-    numerical_features = ['degree', 'harmonic', 'betweenness', 'pagerank', 'eigenvector', 'eccentricity']
+    numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 else:
     numerical_features = ['degree', 'eccentricity']
 

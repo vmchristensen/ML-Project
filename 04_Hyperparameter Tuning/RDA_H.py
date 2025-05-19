@@ -4,6 +4,8 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
+from pathlib import Path
+
 
 class RDA(BaseEstimator, ClassifierMixin):
     """
@@ -59,8 +61,10 @@ class RDA(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
-# Load and preprocess data
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
@@ -76,8 +80,8 @@ groups = data['sentence_group']
 
 # Hyperparameter grid
 param_grid = {
-    'alpha': [0.0, 0.2, 0.5, 0.8, 1.0],
-    'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]
+    'alpha': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    'gamma': [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 }
 
 # Tuning setup
@@ -123,6 +127,7 @@ for alpha in param_grid['alpha']:
 print("\n=== Final Results ===")
 print(f"Best parameters: {best_params}")
 print(f"Best mean accuracy: {best_score:.3f}")
+
 
 """
 === Final Results ===

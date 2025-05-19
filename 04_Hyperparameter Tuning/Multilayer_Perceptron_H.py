@@ -11,15 +11,17 @@ from torch.utils.data import DataLoader, TensorDataset
 import time
 from collections import defaultdict
 import random
+from pathlib import Path
 
 # Configuration
 RANDOM_SEED = 42
 NUM_HYPERPARAM_TRIALS = 20
 torch.manual_seed(RANDOM_SEED)
 
-# Load and preprocess data
-print("Loading and preprocessing data...")
-data = pd.read_csv("preprocessed_train.csv")
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
+data = pd.read_csv(data_path)
 
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
@@ -216,18 +218,7 @@ for key, value in best_params.items():
     print(f"- {key}: {value}")
 
 """
-🔥 New best score: 0.352!
+New best score: 0.346!
 
-Trial completed in 177.9s
-Current best accuracy: 0.352
-
-=== HYPERPARAMETER SEARCH RESULTS ===
-Best validation accuracy: 0.352
-Best parameters:
-- learning_rate: 0.001
-- hidden_layers: (128, 64)
-- dropout_rate: 0.4
-- batch_size: 512
-- weight_decay: 1e-05
-- optimizer: adam
+Parameters: {'learning_rate': 0.0001, 'hidden_layers': (64, 32), 'dropout_rate': 0.4, 'batch_size': 512, 'weight_decay': 0.0001, 'optimizer': 'adam'}
 """

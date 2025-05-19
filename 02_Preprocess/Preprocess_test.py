@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import ast
 import networkx as nx
+from pathlib import Path
 
 def centralities(edgelist):
     """Compute centrality scores for each node in the tree."""
@@ -15,8 +16,10 @@ def centralities(edgelist):
     ecc = nx.eccentricity(T)
     return {v: (dc[v], cl[v], bc[v], pc[v], cc[v], ec[v], ecc[v]) for v in T}
 
-# Load test data (assumes columns: id, language, n, edgelist)
-test_df = pd.read_csv('test.csv')
+# Load data
+script_dir = Path(__file__).parent
+data_path = script_dir.parent / "01_Data" / "test.csv"
+test_df = pd.read_csv(data_path)
 
 expanded_rows = []
 
@@ -35,7 +38,7 @@ for idx, row in test_df.iterrows():
     
     # Add metadata
     df_sentence['vertex_id'] = nodes
-    df_sentence['sentence_id'] = row['id']
+    df_sentence['id'] = row['id']
     df_sentence['n'] = row['n']
     df_sentence['language'] = row['language']
     
@@ -48,4 +51,7 @@ for idx, row in test_df.iterrows():
     expanded_rows.append(df_sentence)
 
 expanded_test_df = pd.concat(expanded_rows, ignore_index=True)
-expanded_test_df.to_csv('preprocessed_test.csv', index=False)
+
+# Save preprocessed data
+output_path = script_dir.parent / "01_Data" / "preprocessed_test.csv"
+expanded_test_df.to_csv(output_path, index=False)
