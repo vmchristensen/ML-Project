@@ -1,5 +1,3 @@
-# Victoria – Decision Tree Classifier with sentence-level accuracy
-
 import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier

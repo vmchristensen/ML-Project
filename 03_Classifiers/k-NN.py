@@ -16,14 +16,14 @@ data = pd.read_csv(data_path)
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
-# Preprocessing: One-hot encode language, scale numeric features
+# Preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
         ('lang', OneHotEncoder(handle_unknown='ignore'), categorical_features),
         ('num', StandardScaler(), numerical_features)
     ])
 
-# k-NN model
+# Initialize model
 model = KNeighborsClassifier(
     n_neighbors=5,
     weights='distance',

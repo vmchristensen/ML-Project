@@ -204,7 +204,7 @@ for trial_idx, params in enumerate(param_combinations):
     if trial_score > best_score:
         best_score = trial_score
         best_params = params
-        print(f"\n🔥 New best score: {best_score:.3f}!")
+        print(f"\nNew best accuracy: {best_score:.3f}!")
     
     trial_time = time.time() - trial_start
     print(f"\nTrial completed in {trial_time:.1f}s")
@@ -218,7 +218,7 @@ for key, value in best_params.items():
     print(f"- {key}: {value}")
 
 """
-New best score: 0.346!
+Best validation accuracy: 0.346
 
-Parameters: {'learning_rate': 0.0001, 'hidden_layers': (64, 32), 'dropout_rate': 0.4, 'batch_size': 512, 'weight_decay': 0.0001, 'optimizer': 'adam'}
+Best parameters: {'learning_rate': 0.0001, 'hidden_layers': (64, 32), 'dropout_rate': 0.4, 'batch_size': 512, 'weight_decay': 0.0001, 'optimizer': 'adam'}
 """

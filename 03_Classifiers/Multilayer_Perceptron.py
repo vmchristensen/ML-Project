@@ -60,8 +60,7 @@ class CustomMLP(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
-# Fixed hyperparameters
-fixed_params = {
+parameters = {
     'learning_rate': 0.0001,
     'hidden_layers': (64, 32),
     'dropout_rate': 0.4,
@@ -94,23 +93,23 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     # Model initialization
     model = CustomMLP(
         input_size=X.shape[1],
-        hidden_layers=fixed_params['hidden_layers'],
-        dropout_rate=fixed_params['dropout_rate']
+        hidden_layers=parameters['hidden_layers'],
+        dropout_rate=parameters['dropout_rate']
     ).to(device)
     
     # Optimizer setup
-    if fixed_params['optimizer'] == 'adam':
+    if parameters['optimizer'] == 'adam':
         optimizer = optim.Adam(
             model.parameters(),
-            lr=fixed_params['learning_rate'],
-            weight_decay=fixed_params['weight_decay']
+            lr=parameters['learning_rate'],
+            weight_decay=parameters['weight_decay']
         )
     else:
         optimizer = optim.SGD(
             model.parameters(),
-            lr=fixed_params['learning_rate'],
+            lr=parameters['learning_rate'],
             momentum=0.9,
-            weight_decay=fixed_params['weight_decay']
+            weight_decay=parameters['weight_decay']
         )
     
     # Training setup
@@ -118,7 +117,7 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     train_dataset = TensorDataset(X_train.to(device), y_train.to(device))
     train_loader = DataLoader(
         train_dataset,
-        batch_size=fixed_params['batch_size'],
+        batch_size=parameters['batch_size'],
         shuffle=True
     )
     

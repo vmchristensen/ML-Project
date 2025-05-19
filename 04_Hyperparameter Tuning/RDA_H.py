@@ -6,7 +6,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import GroupKFold
 from pathlib import Path
 
-
 class RDA(BaseEstimator, ClassifierMixin):
     """
     Custom Regularized Discriminant Analysis (RDA) Classifier.
@@ -127,7 +126,6 @@ for alpha in param_grid['alpha']:
 print("\n=== Final Results ===")
 print(f"Best parameters: {best_params}")
 print(f"Best mean accuracy: {best_score:.3f}")
-
 
 """
 === Final Results ===

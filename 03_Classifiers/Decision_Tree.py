@@ -11,6 +11,7 @@ from pathlib import Path
 script_dir = Path(__file__).parent
 data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
+
 # Define features and target
 categorical_features = ['language']
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
@@ -26,7 +27,7 @@ X = preprocessor.fit_transform(data)
 y = data['target']
 groups = data['sentence_group']
 
-# Best-tuned Decision Tree
+# Initialize model
 model = DecisionTreeClassifier(
     max_depth=3,
     min_samples_split=2,

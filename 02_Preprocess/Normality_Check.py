@@ -8,7 +8,6 @@ from pathlib import Path
 script_dir = Path(__file__).parent
 data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
-#data = pd.read_csv("v3_preprocessed_train_degree_eccentricity.csv") # Or your preferred one for this check
 
 # Define your numerical features
 if 'pagerank' in data.columns:
@@ -18,8 +17,7 @@ else:
 
 print(f"Checking normality for features: {numerical_features}")
 
-# --- SAMPLING PARAMETER ---
-SAMPLE_SIZE = 5000 # Adjust as needed; 5000 is good for Q-Q plots and Shapiro-Wilk
+SAMPLE_SIZE = 5000
 
 # Separate data by class
 data_class_0 = data[data['target'] == 0]
@@ -28,10 +26,9 @@ data_class_1 = data[data['target'] == 1]
 # --- Visual Inspection with Sampling ---
 for feature in numerical_features:
     print(f"Processing feature: {feature}")
-    plt.figure(figsize=(12, 10)) # Increased figure size for clarity
+    plt.figure(figsize=(12, 10)) 
 
-    # --- Histograms (can use full data or sample if very slow) ---
-    # Using a sample for consistency, but full data for histplot is often okay
+    # --- Histograms ---
     sampled_c0_hist = data_class_0[feature].dropna()
     if len(sampled_c0_hist) > SAMPLE_SIZE:
         sampled_c0_hist = sampled_c0_hist.sample(SAMPLE_SIZE, random_state=42)
@@ -52,7 +49,7 @@ for feature in numerical_features:
     plt.title(f'Sampled Hist of {feature} (Class 1)')
     plt.legend()
 
-    # --- Q-Q Plots (use sampled data) ---
+    # --- Q-Q Plots ---
     sampled_c0_qq = data_class_0[feature].dropna()
     if len(sampled_c0_qq) > SAMPLE_SIZE:
         sampled_c0_qq = sampled_c0_qq.sample(SAMPLE_SIZE, random_state=42)
@@ -62,7 +59,7 @@ for feature in numerical_features:
         sampled_c1_qq = sampled_c1_qq.sample(SAMPLE_SIZE, random_state=42)
 
     plt.subplot(2, 2, 3)
-    if len(sampled_c0_qq) > 1: # probplot needs at least 2 points
+    if len(sampled_c0_qq) > 1:
         stats.probplot(sampled_c0_qq, dist="norm", plot=plt)
     plt.title(f'Sampled Q-Q Plot of {feature} (Class 0)')
 
@@ -75,10 +72,8 @@ for feature in numerical_features:
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
 
-# --- Statistical Tests (Optional - ONLY IF NEEDED and use sampled data) ---
-# For the report, visual evidence is often sufficient.
-# If you run this, it will be much faster with SAMPLE_SIZE.
-run_statistical_tests = False # Set to True if you really want to see p-values
+# --- Statistical Tests ---
+run_statistical_tests = False
 
 if run_statistical_tests:
     print("\n--- Shapiro-Wilk Normality Test (on sampled data) ---")
@@ -87,7 +82,7 @@ if run_statistical_tests:
     for feature in numerical_features:
         # Test for Class 0
         sample_class_0_test = data_class_0[feature].dropna()
-        if len(sample_class_0_test) > SAMPLE_SIZE: # Ensure we use the defined sample size
+        if len(sample_class_0_test) > SAMPLE_SIZE:
             sample_class_0_test = sample_class_0_test.sample(SAMPLE_SIZE, random_state=42)
         
         if len(sample_class_0_test) >= 3 and len(sample_class_0_test) <= 5000:

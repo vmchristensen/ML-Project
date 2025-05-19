@@ -82,9 +82,8 @@ print("\n=== Best Hyperparameters ===")
 print(best_params)
 print(f"Validation Accuracy: {best_score:.3f}")
 
-
 """
 === Best Hyperparameters ===
-Testing parameters: {'n_estimators': 20, 'max_depth': None, 'min_samples_split': 2, 'min_samples_leaf': 5, 'max_features': 'log2', 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
-Iteration result: Score = 0.333
+{'n_estimators': 20, 'max_depth': None, 'min_samples_split': 2, 'min_samples_leaf': 5, 'max_features': 'log2', 'class_weight': 'balanced', 'n_jobs': -1, 'random_state': 42}
+Validation Accuracy: Score = 0.333
 """
