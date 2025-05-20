@@ -16,7 +16,6 @@ def centralities(edgelist):
     ecc = nx.eccentricity(T)
     return {v: (dc[v], cl[v], bc[v], pc[v], cc[v], ec[v], ecc[v]) for v in T}
 
-
 # Load data
 script_dir = Path(__file__).parent
 data_path = script_dir.parent / "01_Data" / "train.csv"
