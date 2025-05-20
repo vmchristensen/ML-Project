@@ -2,6 +2,8 @@
 
 2- Execute Preprocess_train.py and Preprocess_test.py, found in folder 02_Preprocess to generate files preprocessed_train.csv and preprocessed_test.csv, found in 01_Data
 
+Optional - To get the hyperparameters found in the final model, execute Decision_Tree_H.py, found in 04_Hyperparameter Tuning
+
 3- Execute 01_Train_Save.py found in folder 05_Final Model to train and generate the model file model.joblib and preprocessor.joblib, found in the same folder
 
 4- Execute 02_Predict.py found in folder 05_Final Model to generate submission.csv found in 01_Data
