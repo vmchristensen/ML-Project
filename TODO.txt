@@ -1,0 +1,4 @@
+- Normality of each numerical feature ('degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity')
+- SVM classifier
+- Hyperparameter optimization and save best parameters in a comment below code (k-NN, Logistic Regression, SVM)
+- Write it in the report
