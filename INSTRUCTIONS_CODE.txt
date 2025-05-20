@@ -1,0 +1,9 @@
+1- Either unzip all files or clone GitHub repository https://github.com/danirc2/ML-Project
+
+2- Execute Preprocess_train.py and Preprocess_test.py, found in folder 02_Preprocess to generate files preprocessed_train.csv and preprocessed_test.csv, found in 01_Data
+
+3- Execute 01_Train_Save.py found in folder 05_Final Model to train and generate the model file model.joblib and preprocessor.joblib, found in the same folder
+
+4- Execute 02_Predict.py found in folder 05_Final Model to generate submission.csv found in 01_Data
+
+Note: All generated files are already in the repository, so you can skip any step to save time (preprocess takes 2-3 minutes)
