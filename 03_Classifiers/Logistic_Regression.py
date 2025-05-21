@@ -12,8 +12,8 @@ data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
 
 # Define features and target
-categorical_features = ['language']
-numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
+categorical_features = []
+numerical_features = ['closeness']
 
 # Preprocessing
 preprocessor = ColumnTransformer(
@@ -32,6 +32,7 @@ model = LogisticRegression(
     class_weight='balanced',
     solver='liblinear',
     penalty='l2',
+    C=0.1,
     max_iter=1000,
     random_state=42
 )
