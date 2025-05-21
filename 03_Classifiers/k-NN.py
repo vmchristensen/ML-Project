@@ -13,7 +13,7 @@ data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
 
 # Define features
-categorical_features = ['language']
+categorical_features = []
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing
@@ -25,9 +25,9 @@ preprocessor = ColumnTransformer(
 
 # Initialize model
 model = KNeighborsClassifier(
-    n_neighbors=5,
+    n_neighbors=7,
     weights='distance',
-    metric='minkowski'
+    metric='euclidean'
 )
 
 # Pipeline
@@ -52,7 +52,7 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
     test_data = data.iloc[test_idx].copy()
 
     # Fit and predict
-    pipeline.fit(X_train, y_train)
+    pipeline.fit(X_train, y_train) 
     proba = pipeline.predict_proba(X_test)[:, 1]
 
     # Attach probabilities
@@ -70,3 +70,6 @@ for fold_idx, (train_idx, test_idx) in enumerate(group_kfold.split(X, y, groups=
 print("\n=== Cross-Validation Results ===")
 print(f"Sentence-Level Accuracies: {accuracies}")
 print(f"Mean Accuracy: {np.mean(accuracies):.3f} (±{np.std(accuracies):.3f})")
+
+
+
