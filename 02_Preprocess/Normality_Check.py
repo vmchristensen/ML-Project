@@ -9,13 +9,8 @@ script_dir = Path(__file__).parent
 data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
 
-# Define your numerical features
-if 'pagerank' in data.columns:
-    numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
-else:
-    numerical_features = ['degree', 'eccentricity']
 
-print(f"Checking normality for features: {numerical_features}")
+numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 SAMPLE_SIZE = 5000
 
