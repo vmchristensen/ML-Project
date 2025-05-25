@@ -14,7 +14,7 @@ data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
 #data = data.sample(10000, random_state=42)
 
-categorical_features = ['language']
+categorical_features = []
 numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 preprocessor = ColumnTransformer(
@@ -30,8 +30,8 @@ groups = data['sentence_group']
 
 
 # Define the param grid
-C_values = [0.1, 1, 10]
-gamma_values = ['scale', 'auto']
+C_values = [0.1, 1]
+gamma_values = ['scale', 'auto', 0.01, 0.1]
 param_grid = list(itertools.product(C_values, gamma_values))
 
 best_score = 0
@@ -41,9 +41,9 @@ for C_val, gamma_val in param_grid:
     print(f"Testing C={C_val}, gamma={gamma_val}")
     
     model = SVC(
-        kernel='linear',
+        kernel='rbf', # tried rbf and linear
         C=C_val,
-        gamma=gamma_val,
+        gamma=gamma_val, # remove when using linear kernel
         class_weight='balanced',
         probability=True,
         random_state=42
@@ -83,7 +83,7 @@ print("Best parameters: C =", best_params[0], ", gamma =", best_params[1])
 
 """
 === Best Parameters ===
-Optimal Parameters: 
-Optimal Features: 
-Best Sentence Level Accuracy: 
+Optimal Parameters: kernel = linear, C = 1
+Optimal Features: all numerical features
+Best Sentence Level Accuracy: 0.291 (±0.017)
 """

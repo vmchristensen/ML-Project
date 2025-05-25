@@ -11,11 +11,10 @@ from sklearn.pipeline import Pipeline
 script_dir = Path(__file__).parent
 data_path = script_dir.parent / "01_Data" / "preprocessed_train.csv"
 data = pd.read_csv(data_path)
-data = data.sample(100000, random_state=42)
 
 # Define features and target
 categorical_features = []
-numerical_features = ['degree', 'closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
+numerical_features = ['degree','closeness', 'betweenness', 'pagerank', 'harmonic', 'eigenvector', 'eccentricity']
 
 # Preprocessing: One-hot encode language, scale numeric features (important for SVM)
 preprocessor = ColumnTransformer(
@@ -33,7 +32,6 @@ groups = data['sentence_group']
 model = SVC(
     kernel='linear',             # You can change to 'linear' or 'poly' if desired
     C=1.0,
-    gamma = 0.1,
     class_weight='balanced',
     probability=True,         # Needed to get predict_proba for sentence-level scoring
     random_state=42
